@@ -101,6 +101,9 @@ class CityModel(mesa.Model):
             elif self.grid.properties["Right"].data[x,y]:
               self.grid.place_agent(c, (x,y))
               added = True
+            elif self.grid.properties["Estacionamiento"].data[x,y]!=0:
+              self.grid.place_agent(c, (x,y))
+              added = True
 
         print(f"Carro #{c.unique_id} | agregado en posición: {c.pos}")
 

@@ -114,104 +114,110 @@ class CarAgent(mesa.Agent):
         searchpos[0]+=1
 
   def move(self):
-    possibleMoves=[]
+    if self.model.grid.properties["Estacionamiento"].data[self.pos]!=0 and self.model.grid.properties["Estacionamiento"].data[self.pos]!=self.destination:
+      neigh=[(self.pos[0],self.pos[1]+1),(self.pos[0],self.pos[1]-1),(self.pos[0]+1,self.pos[1]),(self.pos[0]-1,self.pos[1])]
+      for n in neigh:
+        if self.model.grid.properties["Up"].data[n]==1 or self.model.grid.properties["Down"].data[n]==1 or self.model.grid.properties["Left"].data[n]==1 or self.model.grid.properties["Right"].data[n]==1:
+          self.model.grid.move_agent(self, n)
+    else:
+      possibleMoves=[]
 
-    #select posible movements
-    #checks the direction of it's position
-    if self.model.grid.properties["Left"].data[self.pos] == 1 :
-      possibleMoves.append((self.pos[0],self.pos[1]-1))
-      if self.pos[0]!=self.model.grid.width-1:
-        if self.model.grid.properties["Left"].data[self.pos[0]+1,self.pos[1]-1]==1:
-          possibleMoves.append((self.pos[0]+1,self.pos[1]-1))
-      if self.pos[0]!=0:
-        if self.model.grid.properties["Left"].data[self.pos[0]-1,self.pos[1]-1]==1:
-          possibleMoves.append((self.pos[0]-1,self.pos[1]-1))
+      #select posible movements
+      #checks the direction of it's position
+      if self.model.grid.properties["Left"].data[self.pos] == 1 :
+        possibleMoves.append((self.pos[0],self.pos[1]-1))
+        if self.pos[0]!=self.model.grid.width-1:
+          if self.model.grid.properties["Left"].data[self.pos[0]+1,self.pos[1]-1]==1:
+            possibleMoves.append((self.pos[0]+1,self.pos[1]-1))
+        if self.pos[0]!=0:
+          if self.model.grid.properties["Left"].data[self.pos[0]-1,self.pos[1]-1]==1:
+            possibleMoves.append((self.pos[0]-1,self.pos[1]-1))
 
-    if self.model.grid.properties["Right"].data[self.pos] == 1 :
-      possibleMoves.append((self.pos[0],self.pos[1]+1))
-      if self.pos[0]!=self.model.grid.width-1:
-        if self.model.grid.properties["Right"].data[self.pos[0]+1,self.pos[1]+1]==1:
-          possibleMoves.append((self.pos[0]+1,self.pos[1]+1))
-      if self.pos[0]!=0:
-        if self.model.grid.properties["Right"].data[self.pos[0]-1,self.pos[1]+1]==1:
-          possibleMoves.append((self.pos[0]-1,self.pos[1]+1))
+      if self.model.grid.properties["Right"].data[self.pos] == 1 :
+        possibleMoves.append((self.pos[0],self.pos[1]+1))
+        if self.pos[0]!=self.model.grid.width-1:
+          if self.model.grid.properties["Right"].data[self.pos[0]+1,self.pos[1]+1]==1:
+            possibleMoves.append((self.pos[0]+1,self.pos[1]+1))
+        if self.pos[0]!=0:
+          if self.model.grid.properties["Right"].data[self.pos[0]-1,self.pos[1]+1]==1:
+            possibleMoves.append((self.pos[0]-1,self.pos[1]+1))
 
-    if self.model.grid.properties["Up"].data[self.pos] == 1 :
-      possibleMoves.append((self.pos[0]-1,self.pos[1]))
-      if self.pos[1]!=self.model.grid.height-1:
-        if self.model.grid.properties["Up"].data[self.pos[0]-1,self.pos[1]+1]==1:
-          possibleMoves.append((self.pos[0]-1,self.pos[1]+1))
-      if self.pos[1]!=0:
-        if self.model.grid.properties["Up"].data[self.pos[0]-1,self.pos[1]-1]==1:
-          possibleMoves.append((self.pos[0]-1,self.pos[1]-1))
+      if self.model.grid.properties["Up"].data[self.pos] == 1 :
+        possibleMoves.append((self.pos[0]-1,self.pos[1]))
+        if self.pos[1]!=self.model.grid.height-1:
+          if self.model.grid.properties["Up"].data[self.pos[0]-1,self.pos[1]+1]==1:
+            possibleMoves.append((self.pos[0]-1,self.pos[1]+1))
+        if self.pos[1]!=0:
+          if self.model.grid.properties["Up"].data[self.pos[0]-1,self.pos[1]-1]==1:
+            possibleMoves.append((self.pos[0]-1,self.pos[1]-1))
 
-    if self.model.grid.properties["Down"].data[self.pos] == 1 :
-      possibleMoves.append((self.pos[0]+1,self.pos[1]))
-      if self.pos[1]!=self.model.grid.height-1:
-        if self.model.grid.properties["Down"].data[self.pos[0]+1,self.pos[1]+1]==1:
-          possibleMoves.append((self.pos[0]+1,self.pos[1]+1))
-      if self.pos[1]!=0:
-        if self.model.grid.properties["Down"].data[self.pos[0]+1,self.pos[1]-1]==1:
-          possibleMoves.append((self.pos[0]+1,self.pos[1]-1))
+      if self.model.grid.properties["Down"].data[self.pos] == 1 :
+        possibleMoves.append((self.pos[0]+1,self.pos[1]))
+        if self.pos[1]!=self.model.grid.height-1:
+          if self.model.grid.properties["Down"].data[self.pos[0]+1,self.pos[1]+1]==1:
+            possibleMoves.append((self.pos[0]+1,self.pos[1]+1))
+        if self.pos[1]!=0:
+          if self.model.grid.properties["Down"].data[self.pos[0]+1,self.pos[1]-1]==1:
+            possibleMoves.append((self.pos[0]+1,self.pos[1]-1))
 
-    #verify possible cells are available (there aren't cars in them) y semaforos
-    invalidPostions = [] #temporal
+      #verify possible cells are available (there aren't cars in them) y semaforos
+      invalidPostions = [] #temporal
 
-    for f in self.forbidenMoves:
-      if f in possibleMoves:
-        possibleMoves.remove(f)
+      for f in self.forbidenMoves:
+        if f in possibleMoves:
+          possibleMoves.remove(f)
 
-    for pos in possibleMoves:
-      cellmates = self.model.grid.get_cell_list_contents([pos]) #Obtener el contenido de la cleda
-      for agent in cellmates:
-        if isinstance(agent, CarAgent): #Buscar agentes carro
-          invalidPostions.append(pos)
-        if isinstance(agent, SemaforoAgent):
-          if agent.complexColorState == -1: #Buscar agentes semaforo rojo
+      for pos in possibleMoves:
+        cellmates = self.model.grid.get_cell_list_contents([pos]) #Obtener el contenido de la cleda
+        for agent in cellmates:
+          if isinstance(agent, CarAgent): #Buscar agentes carro
             invalidPostions.append(pos)
+          if isinstance(agent, SemaforoAgent):
+            if agent.complexColorState == -1: #Buscar agentes semaforo rojo
+              invalidPostions.append(pos)
 
-    #Eliminamos las posiciones invalidas
-    for pos in invalidPostions: #Recorrer posiciones invalidas
-      if pos in possibleMoves: #Remover posiciones invalidad
-        possibleMoves.remove(pos)
+      #Eliminamos las posiciones invalidas
+      for pos in invalidPostions: #Recorrer posiciones invalidas
+        if pos in possibleMoves: #Remover posiciones invalidad
+          possibleMoves.remove(pos)
 
-    #checks that the agent isn't repeating incorrect behaviour
-    shouldAdd=False
+      #checks that the agent isn't repeating incorrect behaviour
+      shouldAdd=False
 
-    if len(possibleMoves) > 2:
-      #marks that the actual position is a desicion point for the agent
-      shouldAdd=True
-      for i in possibleMoves:
-        if i in self.prevMoves and len(possibleMoves)>1:
-          possibleMoves.remove(i)
+      if len(possibleMoves) > 2:
+        #marks that the actual position is a desicion point for the agent
+        shouldAdd=True
+        for i in possibleMoves:
+          if i in self.prevMoves and len(possibleMoves)>1:
+            possibleMoves.remove(i)
 
-    #select next move
-    if len(possibleMoves) > 0:
-      min_moves=[]
-      min_moves.append(possibleMoves[0])
-      min_distance=abs(self.destinationStreet[0]-min_moves[0][0])+abs(self.destinationStreet[1]-min_moves[0][1])
+      #select next move
+      if len(possibleMoves) > 0:
+        min_moves=[]
+        min_moves.append(possibleMoves[0])
+        min_distance=abs(self.destinationStreet[0]-min_moves[0][0])+abs(self.destinationStreet[1]-min_moves[0][1])
 
-      #defines which move will get the agent closer to it's destination
-      for i in possibleMoves:
-        distance=abs(self.destinationStreet[0]-i[0])+abs(self.destinationStreet[1]-i[1])
-        if distance<min_distance:
-          min_moves.append(i)
-          min_distance=distance
+        #defines which move will get the agent closer to it's destination
+        for i in possibleMoves:
+          distance=abs(self.destinationStreet[0]-i[0])+abs(self.destinationStreet[1]-i[1])
+          if distance<min_distance:
+            min_moves.append(i)
+            min_distance=distance
 
-      for m in min_moves:
-        distance=abs(self.destinationStreet[0]-m[0])+abs(self.destinationStreet[1]-m[1])
-        if distance>min_distance:
-          min_moves.remove(m)
-      min_move=min_moves[self.random.randrange(len(min_moves))]
+        for m in min_moves:
+          distance=abs(self.destinationStreet[0]-m[0])+abs(self.destinationStreet[1]-m[1])
+          if distance>min_distance:
+            min_moves.remove(m)
+        min_move=min_moves[self.random.randrange(len(min_moves))]
 
-      #ads the desicion to it's history
-      if(shouldAdd):
-        if(len(self.prevMoves)>20):
-          self.prevMoves.remove(self.prevMoves[0])
-        self.prevMoves.append(min_move)
+        #ads the desicion to it's history
+        if(shouldAdd):
+          if(len(self.prevMoves)>20):
+            self.prevMoves.remove(self.prevMoves[0])
+          self.prevMoves.append(min_move)
 
-      #move agent
-      self.model.grid.move_agent(self, min_move)
+        #move agent
+        self.model.grid.move_agent(self, min_move)
 
   def isDestination(self):
     #checks if it's found its parking spot
