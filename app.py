@@ -28,7 +28,7 @@ def getCarsPositions():
     pos=[]
     for cars in m.agents:
         if isinstance(cars, CarAgent):
-            pos.append({"x":cars.pos[1],"z":cars.pos[0]})
+            pos.append({"x":cars.pos[0],"z":cars.pos[1]})
     return jsonify({"CarsPositions":pos})
 
 
